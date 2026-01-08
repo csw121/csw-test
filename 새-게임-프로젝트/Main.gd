@@ -11,6 +11,13 @@ var next_type: String = ""
 var score: int = 0
 var is_game_over: bool = false
 
+# 연속 이동 (DAS/ARR) 관련 변수
+var das_direction: Vector2i = Vector2i.ZERO
+var das_timer: float = 0.0
+var arr_timer: float = 0.0
+const DAS_DELAY = 0.5     # 연속 이동 시작 대기 시간 (초)
+const ARR_INTERVAL = 0.2  # 연속 이동 간격 (초)
+
 var drop_timer: float = 0.0
 var drop_interval: float = 0.5
 
@@ -64,8 +71,22 @@ func _unhandled_input(event):
 
 	if event.is_action_pressed("ui_left"):
 		current_piece.move(Vector2i(-1, 0))
+		das_direction = Vector2i(-1, 0)
+		das_timer = 0.0
+		arr_timer = 0.0
+	elif event.is_action_released("ui_left"):
+		if das_direction == Vector2i(-1, 0):
+			das_direction = Vector2i.ZERO
+			
 	elif event.is_action_pressed("ui_right"):
 		current_piece.move(Vector2i(1, 0))
+		das_direction = Vector2i(1, 0)
+		das_timer = 0.0
+		arr_timer = 0.0
+	elif event.is_action_released("ui_right"):
+		if das_direction == Vector2i(1, 0):
+			das_direction = Vector2i.ZERO
+			
 	elif event.is_action_pressed("ui_down"):
 		current_piece.move(Vector2i(0, 1))
 	elif event.is_action_pressed("ui_up"):
@@ -79,11 +100,21 @@ func _process(delta):
 	if is_game_over or current_piece == null:
 		return
 
+	# 자동 낙하 처리
 	drop_timer += delta
 	if drop_timer >= drop_interval:
 		if not current_piece.move(Vector2i(0, 1)):
 			_on_piece_locked(current_piece.grid_pos, current_piece.shape, current_piece.color)
 		drop_timer = 0.0
+	
+	# 연속 이동 처리 (DAS/ARR)
+	if das_direction != Vector2i.ZERO:
+		das_timer += delta
+		if das_timer >= DAS_DELAY:
+			arr_timer += delta
+			if arr_timer >= ARR_INTERVAL:
+				current_piece.move(das_direction)
+				arr_timer = 0.0
 
 func _on_piece_locked(pos, shape, color):
 	board.lock_piece(pos, shape, color)
