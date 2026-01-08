@@ -6,7 +6,8 @@ const ROWS = 20
 const CELL_SIZE = 30
 
 # 색상 설정
-const COLOR_GRID_LINE = Color(0.2, 0.2, 0.4, 0.3) # 연한 청회색 격자
+const COLOR_GRID_LINE = Color(0.3, 0.3, 0.5, 0.6) # 더 선명한 청회색 격자
+const COLOR_BOARD_BORDER = Color.GRAY # 보드 외곽 테두리 색상
 const COLOR_GHOST = Color(1, 1, 1, 0.2) # 고스트 블록 (반투명)
 
 # 테트로미노 데이터 (모양 및 색상)
@@ -222,7 +223,11 @@ func draw_block(cell_pos: Vector2, color: Color, is_ghost: bool = false):
 	draw_rect(rect, Color.BLACK, false, 1.0)
 
 func _draw():
-	# 1. 배경 격자 (은은하게)
+	# 1. 배경 격자 및 테두리
+	# 게임보드 전체 영역 테두리 (굵게)
+	var board_rect = Rect2(-2, -2, COLS * CELL_SIZE + 4, ROWS * CELL_SIZE + 4)
+	draw_rect(board_rect, COLOR_BOARD_BORDER, false, 3.0)
+	
 	for i in range(COLS + 1):
 		draw_line(Vector2(i * CELL_SIZE, 0), Vector2(i * CELL_SIZE, ROWS * CELL_SIZE), COLOR_GRID_LINE)
 	for j in range(ROWS + 1):
