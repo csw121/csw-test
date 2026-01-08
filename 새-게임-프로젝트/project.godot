@@ -14,3 +14,7 @@ config/name="새 게임 프로젝트"
 run/main_scene="res://Main.tscn"
 config/features=PackedStringArray("4.5", "Forward Plus")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Constants="*res://Constants.gd"
